@@ -64,8 +64,44 @@
 ### Java 기본 실행
 - VS Code에서 명령 팔레트 실행(Ctrl + Shift + P)
     - Java create
+        1. Build tool > Maven
+        2. No ArchType 선택
+        3. Group ID 입력(com.example)
+        4. Artifact ID 입력(demo)
+        5. 저장 위치 결정
+
+### Spring Boot 설정
+- Visual Studio Code 확장 설치
+    - Spring 검색
+        - Spring Boot Extension Pack 설치 
+            - Spring Initiaizr Java Support
+            - Spring Boot Dashboard
+    - Gradle(빌드툴) 검색
+        - Gradle for Java 설치
+
+### Spring Boot 기본 실행(Java 프로젝트)
+- VS Code에서 명령 팔레트 실행
+    - Spring Initializr: Create a Maven Project
+    - Specify Spring Boot version: 3.3.10 선택
+    - Specify project language: Java
+    - Input Group Id: 본인 아이디 입력/com.jsz
+    - Input Artifact Id: Spring01
+    - Specify packaging type: Jar(Java archive, 압축파일)
+    - Specify Java version: 17
+    - Choose dependencies: Selected 0 dependencies 
+    - 저장 위치 선택
+    - 새 창 열기 - Spring Boot 프로젝트가 루트 폴더가 된 개발 환경
+
+- 실행 방법
+    - 코드 작성
+    - Spring Boot Dashboard > Apps > 앱 실행
+
+- 기초 문법
+    - [JAVA 기초문법](./JAVA_BASIC.md)
 
 ## 2일차
+- 기초 문법 계속
+     - [JAVA 기초문법](./JAVA_BASIC.md)
 ## 3일차
 ## 4일차
 ## 5일차
