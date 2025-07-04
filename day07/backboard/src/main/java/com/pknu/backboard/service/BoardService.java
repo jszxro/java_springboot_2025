@@ -12,7 +12,7 @@ import com.pknu.backboard.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor 
 public class BoardService {
 
     @Autowired
@@ -24,12 +24,12 @@ public class BoardService {
     }
 
     // SELECT * FROM board WHERE bno = ?
-    public Board getBoardOne(Long bno) {
-        Optional<Board> opBoard = this.boardRepository.findById(bno);
+    public Board getBoardOne(Long bno) { 
+        Optional<Board> opBoard = this.boardRepository.findById(bno);  
         if (opBoard.isPresent()) {
             return opBoard.get();
         } else {
-            throw new RuntimeException("board not found"); // 또는 예외를 던질 수도 있습니다.
+            throw new RuntimeException("board not found");
         }
     }
 }

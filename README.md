@@ -28,9 +28,9 @@
   5. Spring - Java 웹개발에 전성기. 웹페이지와 자바영역 분리
      - 대한민국 전자정부 웹프레임워크 기반
      - 설정이 복잡
-  6. Spring Boot - Spring의 단점을 최소화. 설정을 간결화
+  6. `Spring Boot` - Spring의 단점을 최소화. 설정을 간결화
 
-- Spring Boot
+- `Spring Boot`
 
   - https://spring.io/projects/spring-boot
   - Spring 기술을 그대로 사용(마이그레이션이 간단)
@@ -346,230 +346,370 @@
 - 자바의 String 문자열을 웹페이지에 렌더링
 
 ## 6일차(06-30)
-
 - Spring Boot JPA + Oracle + Thymeleaf + React
+    - JPA : DB설계 없이 엔티티 클래스만으로 테이블을 자동 생성해주는 기술. SQL도 필요없음
+        - JPA 이전 - MyBatis(iBatis). SQL + XML로 구성된 ORM(Object Relational Mapaping) 기술
+    - H2 : Oracle, MySQL 등과 달리 인메모리DB. Spring Boot에서 자동으로 실행해주는 DB
+        - 개발할 때 사용. 운영시 이전할 때 DB 종류에 관계없이 이전이 가능. 개발동안 사용
+    - Thymeleaf : JSP 단점을 보안한 템플릿 형태 FE 개발방식
+        - Bootstrap은 필수로 사용
+    - 소셜로그인 : 구글, 카카오, 네이버 SSO 로그인 연동(OAuth 2.0)
+    - React : FE를 완전 분리
 
-  - JPA - DB설계 없이 엔티티 클래스만으로 테이블을 자동 생성해주는 기술. SQL도 필요없음
-    - JPA 이전 - MyBatis(iBatis). SQL + XML로 구성된 ORM(Object Relational Mapping) 기술
-  - H2 - Orcale, MySQL 등과 달리 인메모리DB. Spring Boot에서 자동으로 실행해주는 DB
-    - 개발할 때 사용. 운영시 이전할 때 DB 종류에 관계없이 이전이 가능. 개발동안 사용
-  - Thymeleaf - JSP 단점을 보완한 템플릿 형태 FRONTEND 개발방식
-    - Bootstrap은 필수로 사용
-  - 소셜로그인 - 구글, 카카오, 네이버 SSO 로그인 연동(OAuth 2.0)
-  - React - FRONTEND를 완전 분리
+### Spring Boot 프로젝트 생성
+1. 명령 팔레트로 시작(Ctrl + Shift + P) : Spring Initializr: Create a Gradle(Maven) Project
+    1. Sprint Boot version : 3.5.3
+    2. project language : Java
+    3. Group Id : com.pknu
+    4. Artifact Id : backboard
+    5. package type : Jar
+    6. Java version : 17
+    7. Dependency
+        - Spring boot DevTools : 개발시 필요한 명령어, 기능 포함
+        - Lombok : 어노테이션 등 편리하게 해주는 폴러그인 라이브러리
+        - Spring Web : 프론트엔드(html) 개발을 할 때 필요한 의존성
+        - Thymeleaf : html + Spring Boot 태그 매핑을 해주는 기능
+        - H2 Database(later) : 개발동안 필요한 인메모리DB
+        - Oracle Driver(later) : 실제 운영할 DB
+        - Spring Data JPA(later) : DB 생성 + ORM
 
-- Spring Boot 프로젝트 생성
+    8. 저장위치 지정, Genetate into this folder 선택
+    9. 오른쪽 하단 프로젝트폴더 Open 버튼 클릭
 
-  1. 명령 팔레트로 시작(Ctrl + Shift + P) : Spring Initializr: Create a Gradle(Maven) Project
-  2. Spring Boot version : 3.5.3
-  3. project language : Java
-  4. Group Id : com.pknu
-  5. Artifact Id : backboard
-  6. package type : Jar
-  7. Java Version : 17
-  8. Dependency
+2. Spring Boot Backboard project
+    - Gradle plugin : Dependency 파악. 프로젝트 업데이트
+    - Spring Boot dashboard : 프로젝트 실행
 
-     - Spring boot DevTools : 개발시 필요한 명령어, 기능 포함
-     - Lombok : 어노테이션 등 편리하게 해주는 플러그인 라이브러리
-     - Spring Web : 프론트엔트(html) 개발을 할 때 필요한 의존성
-     - Thymeleaf : html + Spring Boot 태그 매핑을 해주는 기능
-     - H2 Database(later) : 개발동안 필요한 인메모리DB
-     - Oracle Driver(later) : 실제 운영할 DB
-     - Spring Data JPA(later) : DB 생성 + ORM
-
-  9. 저장위치 지정, Generate into this folder 선택
-  10. 오른쪽 하단 프로젝트폴더 Open폴더 클릭
-
-- Spring Boot Backboard project
-
-  - Gradle plugin - Dependency 파악, 프로젝트 업데이트
-  - Spring Boot dashboard - 프로젝트 실행(왼쪽바에 전원버튼)
-  - static 폴더 밑에 index.html파일 생성 (lang = ko)
-
-- Spring Boot 설정파일
-  - build.gradle - 그레이들에서 설정할 구성내용
-  - application.properties - Spring Boot 프로젝트 자체 설정파일
-  - setting.gradle, gradle-wrapper.properies - 손댈일 없음
+3. Spring Boot 설정파일
+    - build.gradle : 그레이들에서 설정할 구성내용
+    - application.properties : Spring Boot 프로젝트 자체 설정파일
+    - settings.gradle, gradle-wrapper.properties : 손댈일 없음
 
 ### 스프링부트 Backboard 프로젝트
+1. 기본 실행
+    1. resources/application.properties
 
-1. resource/application.properties
+        ```properties
+        server.port=9097 # 포트변경
+        spring.output.ansi.enabled=always # 로그 색상 설정
 
-   ```properties
-   server.port=9097 # 포트변경 (안해도됨)
-   spring.output.ansi.enabled=always # 로그 색상 설정
+        logging.level.root=info   # 로그출력 레벨 설정
+        logging.file.name=C:/temp/backboard.log  # 로그파일 위치
+        ```
 
-   logging.level.root=info     # 로그 출력 레벨 설정
-   logging.file.name=C:/temp/backboard.log # 로그파일 위치
+    2. build.gradle, Dependency
 
-   ```
+        ```gradle
+        dependencies {
+            // ... 생략
 
-2. build.gradle, Dependency
+            // DB연동용 의존성
+            runtimeOnly 'com.h2database:h2'  // 개발시에만 사용하는 InmemoryDB H2
+            implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        }
+        ```
 
-   ```gradle
-   dependencies {
-       // ... 생략
+    3. Controller 작업
 
-       // DB 연동용 의존성
-       runtimeOnly 'com.h2database:h2' // 개발시에만 사용하는 InmemoryDB H2
-       implementation  'org.springframework.boot:spring-boot-starter-data-jpa'
-   }
-   ```
+        - MainController 생성
+        - 새 파일로 생성 or Menu Java New file > class 둘 다 동일
 
-3. Controller 작업
+    4. /resources/templates/ 에 Mapping 메서드 리턴값과 동일한 html을 작성
 
-   - MainController 생성
-   - 새 파일로 생성 or Menu Java New file > class 둘 다 동일
+2. DB연동
+    1. H2 DB 의존성 추가
+    2. application.properties에 H2관련 설정 추가
 
-4. /resources/templates/ 에 Mapping 메서드 리턴값과 동일한 html을 작성
+        ```properties
+        ## H2 DB 설정
+        spring.h2.console.enabled=true
+        # 접속 URL
+        spring.h2.console.path=/h2-console
+        # H2 DB 파일위치 : ~/ (user/Admin/ 에 생성) : ./ 현재프로젝트 폴더 생성
+        spring.datasource.url=jdbc:h2:./local
+        spring.datasource.driver-class-name=org.h2.Driver
+        spring.datasource.username=sa
+        spring.datasource.password=
+        ```
 
-5. DB연동
+    3. http://localhost:9097/h2-console 접속
+        <img src="./image/sb0012.png" width="450">
 
-   1. H2 DB 의존성 추가
-   2. application.properties에 H2관련 설정 추가
-      ```properties
-      ## H2 DB 설정
-      spring.h2.console.enabled=true
-      spring.h2.console.path=/h2-console
-      spring.datasource.url=jdbc:h2:./local
-      spring.datasource.driver-class-name=org.h2.Driver
-      spring.datasource.username=sa
-      spring.datasource.password=
-      ```
-   3. http://localhost:9097/h2-console 접속
+    4. application.properties에 JPA 설정
 
-   <img src="./image/sb0012.png" width="450">
+        ```properties
+        ## JPA DB 설정
+        spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+        spring.jpa.hibernate.ddl-auto=update
+        ```
 
-   4. application.properties에 JPA 설정
+        - JPA 등의 ORM 작업시 사용하는 기술 : 하이버네이트
+            - spring.jpa.hibernate.ddl-auto 종류
+                - create : SB 서버 시작시 테이블을 모두 삭제 후 재생성(데이터모두 휘발)
+                - create-drop : create와 동일. 서버가 종료되면 테이블 모두 삭제
+                - `update` : 엔티티 변경부부만 적용. 원래 있던 데이터는 존재
+                - `validate` : 엔티티와 테이블간 차이점 검사만
+                - truncate : 데이터를 전부 날림
+                - none : 엔티티가 변경되어도 DB는 변경하지 않음
 
-      ```properties
-      spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
-      spring.jpa.hibernate.ddl-auto=update
-      ```
+    5. MVC 패턴에 맞춰 각 기능별로 패키지(폴더) 생성
+        - entity, repository, service, controller ...
+        - templates 내 html
 
-      - JPA 등의 ORM 작업시 사용하는 기술 - 하이버네이트
-      - spring.jpa.hibernate.ddl-auto 종류
-        - create : SB 서버 시작시 테이블을 모두 삭제 후 재생성
-        - create-drop : create와 동일. 서버가 종료되면 테이블 모두 삭제
-        - `update` : 엔티티 변경부분만 적용. 원래 있던 데이터는 존재
-        - `validation` : 엔티티와 테이블간 차이점 검사만
-        - truncate : 데이터를 전부 날림
-        - none : 엔티티가 변경되어도 DB는 변경하지 않음
-
-   5. MVC 패턴에 맞춰서 각 기능별로 패키지(폴더) 생성
-
-      - controller, entity, ,repository, service...
-
-   6. @(Annotation) 정리
-
-      - Lombok
-        - @Getter : getter 메서드 자동 생성
-        - @Setter : setter 메서드 자동 생성
-      - JPA
-        - @Entity : 테이블화 할 객체 선언
-        - @Id : 테이블 PK
-        - @GeneratedValue(strategy = GenerationType.AUTO)
-          - AUTO : MySQL Auto Increment
-          - IDENTITY : SQLServer Identity(1, 1)
-          - SEQUENCE : Oracle Sequence
-          - H2 DB를 오라클 타입으로 사용하고, 나중에 운영DB를 오라클로 갈아타겠다!
-        - @Column : 컬럼의 속성을 변경 (ex: @Column(name="subject", length=250))
-          - name : DB상의 실제 컬럼명을 엔티티와 다르게 사용할 때
-          - length : 길이를 지정
-          - updatable : 최초 작성이후 수정여부. false는 수정불가
+    6. @(Annotation) 정리
+        - Lombok
+            - `@Getter` : getter 메서드 자동 생성
+            - `@Setter` : setter 메서드 자동 생성
+        - JPA
+            - `@Entity` : 테이블화 할 객체 선언
+            - @Id : 테이블 PK
+            - @GeneratedValue(strategy = GenerationType.SEQUENCE)
+                - AUTO : JPA가 자동 선별. 사용 지양
+                - `IDENTITY` : SQLServer Identity(1, 1), MySQL Auto-Increment
+                - `SEQUENCE` : Oracle Sequence
+                - H2 DB를 오라클 타입으로 사용하고, 나중에 운영DB를 오라클로 갈아타겠다!
+        - @Column : 컬럼의 속성을 변경 (ex: @Column(name="subject", length = 250))
+            - name : DB상의 실제 컬럼명을 엔티티와 다르게 사용할 때
+            - length : 길이를 지정
+            - updatable : 최초 작성이후 수정여부. false는 수정불가
+            - columnDefinition : "TEXT" MySQL, "CLOB" Oracle. H2는 사용불가
         - SpringFramework
-          - @CreatedDate : 생성일
-          - @LastModifiedDate : 최종수정파일에 대한 어노테이션
+            - @CreatedDate : 생성일
+            - @LastModifiedDate : 최종수정일 에 대한 어노테이션
 
-   7. entity 작성
+    7. entity 패키지(폴더) 작성
+        1. 테이블로 생성할 Board 클래스 생성
+        2. Lombok @Getter/@Setter를 사용하면 Get~, Set~ 메서드를 작성할 필요없음
 
-      1. 테이블로 생성할 Board 클래스 생성
-      2. Lombok @Getter/@Setter를 사용하면 Get~, Set~ 메서드를 작성할 필요없음
+    8. repository 패키지(폴더) 작성
+        1. DB상의 데이터를 조회, 저장, 수정, 삭제할 수 있게 도와주는 인터페이스
+        2. SELECT -> findAll(), INSERT -> save() 메서드를 기본 제공
+        3. BoardRepository 인터페이스 생성
 
-   8. repository 작성
+3. 단위 테스트
+    1. build.gradle에 JUnit 의존성 추가
 
-      1. DB상의 데이터를 조회, 저장, 수정, 삭제할 수 있게 도와주는 인터페이스
-      2. SELECT -> findAll(), INSERT -> save() 메서드를 기본 제공
-      3. BoardRepository 인터페이스 생성
+        ```gradle
+        // JUnit 단위테스트
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        ```
+    2. INSERT 단위테스트    
+    3. test/.../backboard/BackboardApplicationTests.java 에 단위테스트 메서드 작성
 
-   9. 단위테스트
+        <img src="./image/sb0013.png" width="600">
 
-      1. build.gradle에 JUnit 의존성 추가
+    4. SELECT, SELECT ... WHERE 단위테스트
+    5. 디버그콘솔에서 쿼리 로그로 확인. application.properties 설정추가
 
-      ```
-      // JUnit 단위테스트
-      testImplementation 'org.junit.jupiter:junit-jupiter'
-      ```
+        ```properties
+        # 테스트시 쿼리 확인
+        spring.jpa.properties.hibernate.format_sql=true
+        spring.jpa.properties.hibernate.show_sql=true
+        ```
 
-      2. INSERT 단위테스트
-      3. test/.../backboard/BackboardApplicationTests.java에 단위테스트 메서드 작성
-      4. SELECT,SELECT ... WHERE 단위테스트
-      5. 디버그 콘솔에서 쿼리 로그로 확인. application.properties 설정추가
+    6. SELCT ... WHERE LIKE, DELETE FROM 단위테스트
 
-      ```properties
-      # 테스트시 쿼리 확인
-      spring.jpa.properties.hibernate.show_sql=true
-      spring.jpa.properties.hibernate.format_sql=true
-      ```
+## 7일차(07-01)
 
-      6. SELECT ... WHERE LIKE, DELETE FROM 단위테스트
+### 스프링부트 Backboard 프로젝트(계속)
+1. 단위 테스트 
+  - UPDATE 테스트
 
-## 7일차
+2. DB연동 개발 계속
+    1. Entity 중 Board(게시글)의 댓글 Reply 클래스 생성
+    2. DB ERD에서 Board : Reply => 1:N(1대 다)를 관계를 가짐
+    3. @(Annotation) 추가
+        - @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE) : 1대다 ERD 관계로 부모클래스(테이블)에 작성하는 부분
+        - @ManyToOne : 다대1 ERD관계로 자식클래스에 작성하는 부분
+        - @Service : 서비스 모듈을 지칭(SpringFramework)
+        - @RequiredArgsConstructor : final등의 멤버변수를 파라미터로 생성자를 만들어주는 것(Lombok)
+        - @AllArgsContructor : 클래스 멤버변수를 사용해서 생성자를 만들어주는 것(Lombok)
+        - @NoArgsContructor : 파라미터(클래스 멤버변수) 없는 빈생성자를 자동으로 생성(Lombok)
+    4. ReplyRepository 인터페이스 작성
+    5. Service 작성
+        - 데이터 처리를 위해서 작성하는 클래스. MVC처럼 패턴처럼 모듈화로 복잡한 코드를 단순화, 역할분리를 위해서
+        - Controller는 게이트(문) 사용자가 접속해서 요청하는 부분
+    6. 엔티티를 DTO 객체 변환
+        - Entity : DB와 연결되어 있는 클래스. 이 객체를 그대로 사용해서 FE로 보내는 방식이 좋지 않음
+        - Dto 사용은 옵션으로 할 수도 있음
+
+    7. BoardController 작성
+    8. /templates/board_list.html 생성 
+        - thymeleaf 문법 적용
+
+          <img src="./image/sb0014.png" width="600">
+
+    9. 상세 페이지 작업
+        - Service, Controller 메서드 작업
+
+    10. 상세 페이지에 댓글 저장 기능 추가
+        - board_detail.html에 댓글 저장 폼양식 추가
+        - ReplyService, ReplyController 각각 생성, 작성
+    
+3. thymeleaf 문법
+    - ${} : 변수 표현식. 변수에 들어있는 값을 화면에 표시하는 기능. Model에 들어있는 데이터를 화면에 표시
+    - @{} : URL링크 표현식. 정적인 링크 또는 라우팅되는 경로를 생성하는 기능
+    - #{} : 메시지 표현식
+    - *{} : 선택변수 표현식. th:object 로 선택된 객체 내의 값에 접근
+    - ~{} : Fragment포함 표현식. 템플릿 Fragement를 사용
+    - thymeleaf 속성에만 사용가능 : th:text, th:href ... 
+
+4. 웹 페이지 디자인
+    1. resources/static : css, js, 정적html 파일들이 위치
+    2. static/main.css : 전체에서 사용할 css 파일
+    3. Bootstrap 적용
+      - https://getbootstrap.com Current v5.3.7 download 클릭
+      - https://github.com/twbs/icons/releases/tag/v1.13.1 
+    4. board_detail.html : 부트스트랩 적용
+  
+5. 전체 HTML에 디자인 적용
+    1. build.gradle에 thymeleaf-layout 의존성 추가
+        ```gradle
+        // Thymeleaf layout 의존성 추가. 250701. 신규추가. Hugo.
+	      implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+        ```
+
+    2. 레이아웃 템플릿 페이지 작성
+    3. board_list.html 에 적용    
+
+        https://github.com/user-attachments/assets/e34d7247-6812-448f-b198-fd0b3896a657
+
+
+## 8일차
+### 스프링부트 Backboard 프로젝트(계속)
+1. DB연동 개발
+    1. 게시글 등록 기능
+    2. Spring Boot Validation 기능 추가 : 입력 검증
+
+        ```gradle
+        // 추가 의존성
+	      implementation 'org.springframework.boot:spring-boot-starter-validation'
+        ```
+        - Annotation으로 검증 수행
+            - @Size, @NotNull, @NotEmpty, @Past(과거날짜만 가능), @Future(미래날짜만)
+            - @FutureOrPresent(미래또는 오늘날짜만), @Pattern(정규식패턴)
+
+    3. 입력검증 클래스, BoardForm.java 생성
+    4. BoardForm 객체를 컨트롤러에 전달
+    5. board_create.html에 입력검증 태그, 속성 등 추가
+        - GetMapping, PostMapping 메서드에 BoardForm 파라미터를 추가!
+
+    6. board_detail.html에 댓글 입력 검증 태그 추가
+        - ReplyController 의 PostMapping 메서드에 ReplyForm을 파라미터로 추가
+        - BoardController의 GetMapping 메서드에 ReplyForm을 @Valid 파라미터로 추가        
+
+    7. 검증영역 태그를 valid_error.html 템플릿 생성
+
+2. Bootstrap 템플릿 사이트
+    - https://startbootstrap.com/
+    - https://bootstrapmade.com/bootstrap-5-templates/
+    - https://mdbootstrap.com/freebies/
+    - https://bootstrapmade.com/
+    - https://www.youtube.com/@codehal (No Bootstrap)
+
+3. Bootstrap Navigation 구현
+    - templates/layout.html 네비게이션 태그 작성
+
+4. Paging : 대량 데이터 로드시 속도 개선
+    - Dummy Data 생성 : Unit 테스트로 대략 200건 입력
+    - Page, Pageable 인터페이스
+        ```java
+        import org.springframework.data.domain.Page;
+        import org.springframework.data.domain.Pageable;
+        ```
+
+    - BoardRepository 인터페이스에 페이징용 findAll() 재정의
+    - BoardService 클래스에 페이징용 getBoardList() 오버로딩 작성
+    - BoardController 클래스에 getList()에 페이징 파라미터 추가
+    - board_list.html에 페이징 컨트롤 추가
+
+        <img src="./image/sb0015.png" width="600">
+
+    - 페이징번호가 모두 표시되는 문제 발생
+
+## 9일차
+
+### 스프링부트 Backboard 프로젝트(계속)
+1. 게시판 작업
+    1. Paging 구현 계속
+        - 페이지수가 10개 안넘도록 처리
+        - 이전페이지, 다음페이지 사용여부 변경
+        - 맨첫페이지, 마지막페이지 버튼 추가
+
+    2. 게시글 최신 글부터 나오도록 정렬
+        1. BoardService getBoardList() 메서드에 정렬로직 추가
+      
+    3. 게시글 개수만큼 번호가 나오도록 수정
+        1. 현재는 각 페이지마다 1~10까지 반복
+        2. 게시물번호 = 전체 게시물개수 - (현재페이지번호 * 10[페이지당 게시글 수]) - 페이지당 인덱스
+        3. board_list.html의 `<td th:text="${index.count}"></td>` 를 수정
+
+    4. Bootstrap 배지로 각 게시글마다 댓글개수 표시
+        - MyBatis로 작업된 Spring Boot : 쿼리변경, 도메인변경, html까지 세군데 수정
+        - JPA로 작업된 Spring Boot : html만 수정하면 끝!!!
+        - board_list.html의 제목 태그에 추가
+
+        <img src="./image/sb0016.png" width="600" height="350">
+
+2. Spring Boot Security : 회원가입, 로그인 등을 손쉽게 개발하도록 도와주는 의존성 라이브러리
+    1. 시큐리티 설치 
+        ```gradle
+        // 스프링부트 시큐리티 의존성
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+        ```
+
+    2. 로그인 화면 및 H2 DB 사용불가
+        - 기본사용자 : user
+        - 패스워드 : Spring Boot 로그에 표시(ex: e197e2f2-6d99-4296-b3c3-5eef0e2aefb7)
+    3. 스프링 시큐리티 설정
+        1. /security/SecurityConfig 클래스 생성
+
+    4. 웹 보안용어
+        - CORS : Cross-Origin Resource Sharing
+            - 기본적으로 서로 다른 오리진(웹서버)인 경우 리소스를 서로 사용할 수 없음            
+        - CSRF : Cross-Site Request Forgery
+            - 명시적인 동의 없이 사용자를 대신해서 웹 앱이 악의적인 행동을 취하는 공격
+
+    6. 스프링 시큐리티 설정 (계속)
+        1. SecurityConfig 클래스 내 filterChain 메서드에 CSRF 등 관련 설정 추가
+    
+    7. 회원가입 구현
+        1. Member 엔티티 클래스 작성
+        2. MemberRepository 인터페이스 작성
+        3. MemberService 클래스 작성
+        4. MemberForm 클래스 작성
+        5. MemberController 클래스 작성
+        6. templates/signup.html 작성
+
+    8. MainController에 URL / 관련 메서드 작업
+        - @GetMapping("/")    
+
+    9. 중복회원 방지 처리
+        1. MemberRepository 커스텀 메서드 추가
+        2. MemberService 중복여부 체크 메서드 추가
+        3. MemberController, setSignUp 메서드 수정
+
+    10. 회원 로그인
+        1. SecurityConfig 클래스에 로그인관련 filterChain 추가
+  
+## 10일차
 
 ### 스프링부트 Backboard 프로젝트(계속)
 
-1. 단위 테스트
+2. Spring Boot Security (계속)
+    1. 회원 로그인
+        1. MemberRole
+        2. MmeberSecurityService
+        3. signin.html
+        4. 회원 로그인 기능
+      
+    2. 회원 로그아웃 기능
 
-   1. UPDATE 테스트
 
-2. 개발 계속
 
-   1. Entity 중 Board(게시글)의 댓글 Reply 클래스 생성
-   2. DB ERD에서 Board : Reply => 1:N(1대 다)를 관계를 가짐
-   3. @(Annotation) 추가
-      - @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE) : 1대다 ERD 관계로 부모클래스(테이블)에 작성하는 부분
-      - @ManyToOne : 다대1 ERD 관계로 자식클래스에 작성하는 부분
-      - @Service : 서비스 모듈을 지칭(SpringFramework)
-      - @RequiredArgsConstructor : 생성자를 만들어줌. 파라미터가 존재하는 생성자를 자동으로 생성(Lombok)
-      - @NoArgsContructor : 파라미터 없는 빈생성자를 자동으로 생성(Lombok)
-   4. ReplyRepository 인터페이스 작성
-   5. Service 작성
-      - 데이터 처리를 위해서 작성하는 클래스. MVC처럼 패턴처럼 모듈화로 복잡한 코드를 단순화, 역할분리를 위해서
-      - Controller는 게이트(문) 사용자가 접속해서 요청하는 부분
-   6. 엔티티를 DTO 객체 변환
+    
 
-      - Entity : DB와 연결되어 있는 클래스. 이 객체를 그대로 사용해서 FE로 보내는 방식이 좋지 않음
-      - Dto 사용은 옵션으로 할 수도 있음
 
-   7. BoardController 작성
-   8. /templates/board_list.html 생성
 
-      - thymeleaf 문법 적용
 
-        <img src="./image/sb0014.png" width="600">
-
-   9. 상세 페이지 작업
-      - Service, Controller 메서드 작업
-   10. 상세 페이지에 댓글 저장 기능 추가
-       - board_detail.html에 댓글 저장 폼양식 추가
-
-3. thymeleaf 문법
-
-   - ${} : 변수표현식, 변수에 들어있는 값을 화면에 표시하는 기능. Model에 들어있는 데이터를 화면에 표시
-   - @{} : URL링크 표현식. 정적인 링크 또는 라우팅되는 경로를 생성하는 기능
-   - #{} : 메시지 표현식
-   - thymeleaf 속성에만 사용가능 : th:text, th:href ...
-
-4. 웹 페이지 디자인
-5. resources/static : css, js, 정적 html 파일들이 위치
-6. static/main.css:전체에서 사용할 css 파일
-7. Bootstrap 사용
-
-   - https://getbootstrap.com Current v5.3.7 download
-   - https://github.com/twbs/icons/releases/tag/v1.13.1
-
-8. board_detail.html : 부트스트랩 적용
-
-9. 전체 HTML에 디자인 적용
-10. build.gradle에 thymeleaf-layout
-11. 레이아웃 템플릿 페이지 작성
